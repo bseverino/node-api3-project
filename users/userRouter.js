@@ -3,11 +3,19 @@ const express = require('express');
 const Users = require('./userDb.js')
 
 const validateUserId = require('../middleware/validateUserId')
+const validateUser = require('../middleware/validateUser')
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
   Users.insert(req.body)
+    .then(user => {
+      res.status(201).json(user)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({ message: 'Error adding user.' })
+    })
 });
 
 router.post('/:id/posts', (req, res) => {
@@ -28,14 +36,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', validateUserId, (req, res) => {
-  Users.getById(req.params.id)
-    .then(user => {
-      res.status(200).json(user)
-    })
-    .catch(err => {
-      console.log(err)
-      res.status(500).json({ message: 'Error retrieving user.' })
-    })
+  res.status(200).json(req.user)
 });
 
 router.get('/:id/posts', (req, res) => {
@@ -51,10 +52,6 @@ router.put('/:id', (req, res) => {
 });
 
 //custom middleware
-
-function validateUser(req, res, next) {
-  // do your magic!
-}
 
 function validatePost(req, res, next) {
   // do your magic!
