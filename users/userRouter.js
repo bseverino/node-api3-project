@@ -5,6 +5,7 @@ const Posts = require('../posts/postDb.js')
 
 const validateUserId = require('../middleware/validateUserId')
 const validateUser = require('../middleware/validateUser')
+const validatePost = require('../middleware/validatePost')
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.post('/', validateUser, (req, res) => {
     })
 });
 
-router.post('/:id/posts', validateUserId, (req, res) => {
+router.post('/:id/posts', validatePost, validateUserId, (req, res) => {
   const newPost = {
     ...req.body,
     user_id: req.user.id
@@ -88,11 +89,5 @@ router.put('/:id', validateUser, validateUserId, (req, res) => {
       res.status(500).json({ message: 'Error updating user.' })
     })
 });
-
-//custom middleware
-
-function validatePost(req, res, next) {
-  // do your magic!
-}
 
 module.exports = router
