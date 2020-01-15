@@ -22,7 +22,7 @@ router.post('/', validateUser, (req, res) => {
 router.post('/:id/posts', validateUserId, (req, res) => {
   const newPost = {
     ...req.body,
-    postedBy: req.user.name
+    user_id: req.user.id
   }
 
   Posts.insert(newPost)
@@ -65,12 +65,28 @@ router.get('/:id/posts', validateUserId, (req, res) => {
     })
 });
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
+router.delete('/:id', validateUserId, (req, res) => {
+  Users.remove(req.user.id)
+    .then(deleted => {
+      res.status(202).json(deleted)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({
+        message: 'Error deleting user.'
+      })
+    })
 });
 
-router.put('/:id', (req, res) => {
-  // do your magic!
+router.put('/:id', validateUser, validateUserId, (req, res) => {
+  Users.update(req.user.id, req.body)
+    .then(user => {
+      res.status(201).json(user)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({ message: 'Error updating user.' })
+    })
 });
 
 //custom middleware
