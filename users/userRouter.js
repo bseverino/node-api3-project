@@ -9,6 +9,7 @@ const validatePost = require('../middleware/validatePost')
 
 const router = express.Router();
 
+// adds a user if name is given
 router.post('/', validateUser, (req, res) => {
   Users.insert(req.body)
     .then(user => {
@@ -20,6 +21,7 @@ router.post('/', validateUser, (req, res) => {
     })
 });
 
+// adds a post if user exists and text is given
 router.post('/:id/posts', validatePost, validateUserId, (req, res) => {
   const newPost = {
     ...req.body,
@@ -36,6 +38,7 @@ router.post('/:id/posts', validatePost, validateUserId, (req, res) => {
     })
 });
 
+// retrieves a list of users
 router.get('/', (req, res) => {
   Users.get(req.query)
     .then(users => {
@@ -49,10 +52,13 @@ router.get('/', (req, res) => {
     })
 });
 
+// retrieves a user by id if they exist
 router.get('/:id', validateUserId, (req, res) => {
   res.status(200).json(req.user)
 });
 
+
+// retrieves a list of posts from a user by id
 router.get('/:id/posts', validateUserId, (req, res) => {
   Users.getUserPosts(req.user.id)
     .then(posts => {
@@ -66,6 +72,7 @@ router.get('/:id/posts', validateUserId, (req, res) => {
     })
 });
 
+// deletes a user by id if they exist
 router.delete('/:id', validateUserId, (req, res) => {
   Users.remove(req.user.id)
     .then(deleted => {
@@ -79,6 +86,7 @@ router.delete('/:id', validateUserId, (req, res) => {
     })
 });
 
+// updates a user by id if name is given
 router.put('/:id', validateUser, validateUserId, (req, res) => {
   Users.update(req.user.id, req.body)
     .then(user => {
