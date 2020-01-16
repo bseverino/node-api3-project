@@ -3,7 +3,7 @@ const express = require('express');
 const Users = require('./userDb.js')
 const Posts = require('../posts/postDb.js')
 
-const validateUserId = require('../middleware/validateUserId')
+const validateId = require('../middleware/validateId')
 const validateUser = require('../middleware/validateUser')
 const validatePost = require('../middleware/validatePost')
 
@@ -22,10 +22,10 @@ router.post('/', validateUser, (req, res) => {
 });
 
 // adds a post if user exists and text is given
-router.post('/:id/posts', validatePost, validateUserId, (req, res) => {
+router.post('/:id/posts', validatePost, validateId(Users), (req, res) => {
   const newPost = {
     ...req.body,
-    user_id: req.user.id
+    user_id: req.resource.id
   }
 
   Posts.insert(newPost)
@@ -53,14 +53,14 @@ router.get('/', (req, res) => {
 });
 
 // retrieves a user by id if they exist
-router.get('/:id', validateUserId, (req, res) => {
-  res.status(200).json(req.user)
+router.get('/:id', validateId(Users), (req, res) => {
+  res.status(200).json(req.resource)
 });
 
 
 // retrieves a list of posts from a user by id
-router.get('/:id/posts', validateUserId, (req, res) => {
-  Users.getUserPosts(req.user.id)
+router.get('/:id/posts', validateId(Users), (req, res) => {
+  Users.getUserPosts(req.resource.id)
     .then(posts => {
       res.status(200).json(posts)
     })
@@ -73,8 +73,8 @@ router.get('/:id/posts', validateUserId, (req, res) => {
 });
 
 // deletes a user by id if they exist
-router.delete('/:id', validateUserId, (req, res) => {
-  Users.remove(req.user.id)
+router.delete('/:id', validateId(Users), (req, res) => {
+  Users.remove(req.resource.id)
     .then(deleted => {
       res.status(202).json(deleted)
     })
@@ -87,8 +87,8 @@ router.delete('/:id', validateUserId, (req, res) => {
 });
 
 // updates a user by id if name is given
-router.put('/:id', validateUser, validateUserId, (req, res) => {
-  Users.update(req.user.id, req.body)
+router.put('/:id', validateUser, validateId(Users), (req, res) => {
+  Users.update(req.resource.id, req.body)
     .then(user => {
       res.status(201).json(user)
     })

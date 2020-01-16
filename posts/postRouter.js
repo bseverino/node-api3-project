@@ -2,7 +2,7 @@ const express = require('express');
 
 const Posts = require('./postDb.js')
 
-const validatePostId = require('../middleware/validatePostId')
+const validateId = require('../middleware/validateId')
 const validatePost = require('../middleware/validatePost')
 
 const router = express.Router();
@@ -20,12 +20,12 @@ router.get('/', (req, res) => {
     })
 });
 
-router.get('/:id', validatePostId, (req, res) => {
-  res.status(200).json(req.post)
+router.get('/:id', validateId(Posts), (req, res) => {
+  res.status(200).json(req.resource)
 });
 
-router.delete('/:id', validatePostId, (req, res) => {
-  Posts.remove(req.post.id)
+router.delete('/:id', validateId(Posts), (req, res) => {
+  Posts.remove(req.resource.id)
     .then(deleted => {
       res.status(202).json(deleted)
     })
@@ -37,8 +37,8 @@ router.delete('/:id', validatePostId, (req, res) => {
     })
 });
 
-router.put('/:id', validatePost, validatePostId, (req, res) => {
-  Posts.update(req.post.id, req.body)
+router.put('/:id', validatePost, validateId(Posts), (req, res) => {
+  Posts.update(req.resource.id, req.body)
     .then(post => {
       res.status(201).json(post)
     })
